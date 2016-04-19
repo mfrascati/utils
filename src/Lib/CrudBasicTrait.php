@@ -1,5 +1,5 @@
 <?php
-namespace Entheos\Utils\Trait;
+namespace Entheos\Utils\Lib;
 
 /**
  * Trait for automation of basic CRUD operations

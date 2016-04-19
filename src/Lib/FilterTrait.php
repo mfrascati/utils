@@ -1,5 +1,5 @@
 <?php
-namespace Entheos\Utils\Trait;
+namespace Entheos\Utils\Lib;
 
 use Cake\Utility\Hash;
 

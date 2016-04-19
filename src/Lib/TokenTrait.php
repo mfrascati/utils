@@ -1,5 +1,5 @@
 <?php
-namespace Entheos\Utils\Trait;
+namespace Entheos\Utils\Lib;
 
 use Cake\Utility\Security;
 use Cake\Network\Exception\UnauthorizedException;
