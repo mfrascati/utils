@@ -32,7 +32,7 @@ trait CrudBasicTrait {
 	 * @param Query $query la query con già impostata la ricerca per ottenere il record
 	 * @return Query
 	 */
-	public function _entityQuery($query){
+	public function _entityQuery($query, $id){
 	    return $query;
 	}
 
@@ -45,7 +45,7 @@ trait CrudBasicTrait {
 	 */
 	public function _findEntityById($id)
 	{
-	    return $this->_entityQuery($this->{$this->name}->find('all')->where([$this->name.'.id' => $id]))->first();
+	    return $this->_entityQuery($this->{$this->name}->find('all')->where([$this->name.'.id' => $id]), $id)->first();
 	}
 
 	/**
@@ -68,7 +68,7 @@ trait CrudBasicTrait {
 	 */
 	public function _beforeFind(\Cake\Event\Event $event)
 	{
-	    $event->subject->query = $this->_entityQuery($event->subject->query);
+	    $event->subject->query = $this->_entityQuery($event->subject->query, $event->subject->id);
 	}
 
 	/**

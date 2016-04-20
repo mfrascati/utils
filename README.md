@@ -11,5 +11,5 @@ composer require mfrascati/utils
 Include traits in your controllers;
 
 ```
-use \Entheos\Utils\Trait\TokenTrait;
+use \Entheos\Utils\Lib\TokenTrait;
 ```
