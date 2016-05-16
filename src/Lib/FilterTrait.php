@@ -20,6 +20,12 @@ trait FilterTrait {
 	// ];
 	// 
 	// I dati vanno passati nel formato Model[field]
+	// 
+	// Per i filtri di tipo "range" date-range, integer-range i diversi valori vanno separati da pipe '|'
+	// mentre il campo di filtro rimane sempre uno e uno soltanto
+	// 
+	// Es.
+	// Model[data]  => '2016-05-10|2016-05-10'
 
 	protected $whitelist = []; // Usato come copia interna
 	protected $filteredFields = [];
