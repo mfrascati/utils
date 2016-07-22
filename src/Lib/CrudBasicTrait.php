@@ -84,4 +84,18 @@ trait CrudBasicTrait {
 	        '_serialize' => ['success', 'data']
 	    ]); 
 	}
+
+	/**
+	 * Scorciatoia per impostare le variabili success e data[message, code] in view json
+	 * @param boolean $success 
+	 * @param array  $data
+	 */
+	public function _setError($message, $code = 500)
+	{
+	    $this->set([
+	        'success' => false,
+	        'data' => ['message' => $message, 'code' => $code],
+	        '_serialize' => ['success', 'data']
+	    ]); 
+	}
 }
