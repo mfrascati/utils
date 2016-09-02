@@ -18,6 +18,16 @@ trait CrudBasicTrait {
 	}
 
 	/**
+	 * Basic edit callback
+	 * If you need to extend the function just copy the function in your controller
+	 */
+	public function edit()
+	{
+	    $this->Crud->on('afterSave', [$this, '_afterSave']);
+	    return $this->Crud->execute();
+	}
+
+	/**
 	 * Basic view callback
 	 * If you need to extend the function just copy the function in your controller
 	 */
