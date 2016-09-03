@@ -65,10 +65,7 @@ trait CrudBasicTrait {
 	 */
 	public function _afterSave(\Cake\Event\Event $event)
 	{
-	    if ($event->subject->created)
-	    {
-	        $this->_setJson(true, $this->_findEntityById($event->subject->entity->id));
-	    }
+        $this->_setJson(true, $this->_findEntityById($event->subject->entity->id));
 	}
 
 	/**
