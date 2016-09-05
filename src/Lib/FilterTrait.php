@@ -90,6 +90,7 @@ trait FilterTrait {
 
 	/**
 	 * Processa la chiave e il valore per farli diventare una query valida
+	 * La prima parte gestisce dei valori speciali per query IS NULL / IS EMPTY
 	 * Controlla che il valore sia del tipo specificato in dichiarazione, se serve forzandone il cast
 	 * 
 	 * @param   Query $query
@@ -99,6 +100,16 @@ trait FilterTrait {
 	 */
 	protected function _buildQueryType($query, $key, $value) 
 	{
+		switch ($value) {
+			case 'isNull':
+				return $query->where(["$key IS" => null]);
+				break;
+			case 'isNotNull':
+				return $query->where(["$key IS NOT" => null]);
+				break;
+			
+		}
+
 		switch($this->whitelist[$key])
 		{
 			case 'like' :
