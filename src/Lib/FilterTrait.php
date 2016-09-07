@@ -107,6 +107,12 @@ trait FilterTrait {
 			case 'isNotNull':
 				return $query->where(["$key IS NOT" => null]);
 				break;
+			case 'isNotEmpty':
+				return $query->where(["$key <>" => '']);
+				break;
+			case 'isNotZero':
+				return $query->where(["$key <>" => 0]);
+				break;
 			
 		}
 
