@@ -9,6 +9,8 @@ trait SimpleTestTrait
 {
 	protected $token = null;
 
+	public $user_id = 1;
+
 	private function authenticateUser()
 	{
 	    Security::salt('secret-key');
@@ -18,7 +20,7 @@ trait SimpleTestTrait
 	        'userModel' => 'Users'
 	    ]);
 
-	    $this->token = JWT::encode(['sub' => 1], Security::salt());
+	    $this->token = JWT::encode(['sub' => $this->user_id], Security::salt());
 	}
 
 	private function getToken()
@@ -30,12 +32,21 @@ trait SimpleTestTrait
 
 	/**
 	 * Imposta gli header per ogni richiesta
+	 *
+	 * Opzioni aggiuntive:
+	 * - user_id: passa un id per rendere possibile il test con token di differenti utenti con ruoli diversi
+	 * 
 	 * @param  boolean $auth Se true imposta il token per l'autenticazione
+	 * @param  array $options Lista di opzioni aggiuntive
 	 * @return void        
 	 */
-	public function setupRequest($auth = true)
+	public function setupRequest($auth = true, $options[])
 	{
 		$headers = ['Accept' => 'application/json'];
+		
+		if(!empty($options['user_id']))
+			$this->user_id = $options['user_id'];
+
 		if($auth == true) {
 			$headers['Authorization'] = 'Bearer '.$this->getToken();
 		}
