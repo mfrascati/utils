@@ -7,9 +7,11 @@ use Firebase\JWT\JWT;
 
 trait SimpleTestTrait
 {
-	protected $token = null;
+	// Cache per i token dei diversi utenti
+	protected $tokens = [];
 
-	public $user_id = 1;
+	// Utente attivo per il singolo test
+	protected $user_id = 1;
 
 	private function authenticateUser()
 	{
@@ -20,14 +22,14 @@ trait SimpleTestTrait
 	        'userModel' => 'Users'
 	    ]);
 
-	    $this->token = JWT::encode(['sub' => $this->user_id], Security::salt());
+	    $this->tokens[$this->user_id] = JWT::encode(['sub' => $this->user_id], Security::salt());
 	}
 
 	private function getToken()
 	{
-		if($this->token === null)
+		if(empty($this->tokens[$this->user_id]))
 			$this->authenticateUser();
-		return $this->token;
+		return $this->tokens[$this->user_id];
 	}
 
 	/**
@@ -43,7 +45,7 @@ trait SimpleTestTrait
 	public function setupRequest($auth = true, $options = [])
 	{
 		$headers = ['Accept' => 'application/json'];
-		
+
 		if(!empty($options['user_id']))
 			$this->user_id = $options['user_id'];
 
