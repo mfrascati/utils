@@ -40,7 +40,7 @@ trait SimpleTestTrait
 	 * @param  array $options Lista di opzioni aggiuntive
 	 * @return void        
 	 */
-	public function setupRequest($auth = true, $options[])
+	public function setupRequest($auth = true, $options = [])
 	{
 		$headers = ['Accept' => 'application/json'];
 		
