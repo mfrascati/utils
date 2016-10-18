@@ -78,6 +78,22 @@ trait SimpleTestTrait
 		return $this->post($this->apiUrl($url), $data);
 	}
 
+	/**
+	 * Wrapper per recuperare i dati della risposta dall'oggetto json
+	 * @param  boolean $assert 
+	 * @return mixed
+	 */
+	public function getResponseData($assert = true)
+	{
+		$response = json_decode($this->_response->body(), true);
+		$data = !empty($response['data']) ? $response['data'] : false;
+
+		if($assert){
+			$this->assertResponseOk();
+		}
+		return $data;
+	}
+
 	public function stringToDatetime(&$string){
 		$string = date('Y-m-d H:i:s', strtotime($string));
 	}
