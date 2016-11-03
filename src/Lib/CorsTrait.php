@@ -3,6 +3,7 @@ namespace Entheos\Utils\Lib;
 
 /**
  * Trait for simplyfing handle of CORS headers and preflight response
+ * Add it to AppController::initialize()
  */
 trait CorsTrait {
 
