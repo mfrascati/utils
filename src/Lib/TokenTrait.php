@@ -15,15 +15,15 @@ trait TokenTrait {
 	 */
 	public function token()
 	{
-	    if (!$this->request->data('username'))
-	        throw new UnauthorizedException('Invalid username or password');
+	    if (!$this->request->data('username') || !$this->request->data('password'))
+	        throw new UnauthorizedException(__('Nome utente o password non impostati'));
 
 	    $user = $this->Users->find()
 	    	->where(['username' => $this->request->data('username'), 'active' => true])
 		    ->first();
 
 	    if (empty($user) || !(new DefaultPasswordHasher)->check($this->request->data('password'), $user->password))
-	        throw new UnauthorizedException('Invalid username or password');
+	        throw new UnauthorizedException(__('Nome utente o password non validi'));
 
 	    $this->set([
 	        'success' => true,
