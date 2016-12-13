@@ -100,21 +100,14 @@ trait FilterTrait {
 	 */
 	protected function _buildQueryType($query, $key, $value) 
 	{
-		switch ($value) {
-			case 'isNull':
-				return $query->where(["$key IS" => null]);
-				break;
-			case 'isNotNull':
-				return $query->where(["$key IS NOT" => null]);
-				break;
-			case 'isNotEmpty':
-				return $query->where(["$key <>" => '']);
-				break;
-			case 'isNotZero':
-				return $query->where(["$key <>" => 0]);
-				break;
-			
-		}
+		if($value === 'isNull')
+			return $query->where(["$key IS" => null]);
+		if($value === 'isNotNull')
+			return $query->where(["$key IS NOT" => null]);
+		if($value === 'isNotEmpty')
+			return $query->where(["$key <>" => '']);
+		if($value === 'isNotZero')
+			return $query->where(["$key <>" => 0]);
 
 		switch($this->whitelist[$key])
 		{
