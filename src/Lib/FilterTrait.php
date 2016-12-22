@@ -127,7 +127,7 @@ trait FilterTrait {
 					'0' => false, 'NO' => false,
 					'1' => true,  'SI' => true,
 				];
-				if(!empty($values[$value]))
+				if(isset($values[$value]))
 					return $query->where([$key => (bool)$values[$value]]);
 				break;
 
