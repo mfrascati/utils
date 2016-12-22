@@ -123,8 +123,12 @@ trait FilterTrait {
 				break;
 
 			case 'boolean':
-				return $query->where([$key => (bool)$value]);
-
+				$values = [
+					'0' => false, 'NO' => false,
+					'1' => true,  'SI' => true,
+				];
+				if(!empty($values[$value]))
+					return $query->where([$key => (bool)$values[$value]]);
 				break;
 
 			case 'date' : 
