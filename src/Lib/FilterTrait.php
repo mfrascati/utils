@@ -80,8 +80,8 @@ trait FilterTrait {
 		$data = $this->paginate($query);
 
 		$this->set([
-		    'success' => !$data->isEmpty() ,
-		    'data' => !$data->isEmpty() ? $data : null,
+		    'success' => true,
+		    'data' => !$data->isEmpty() ? $data : [],
 		    'pagination' => $this->__paginationData(),
 		    '_serialize' => ['success', 'data', 'pagination']
 		]);
