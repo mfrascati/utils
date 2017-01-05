@@ -14,8 +14,10 @@ class ApiExceptionRenderer extends ExceptionRenderer
 	        'error' => $this->controller->viewVars['message'],
 	        'code' => $this->controller->viewVars['code']
 	    ];
-	    if($data['code'] == 422 && !empty($this->controller->viewVars['error']))
+	    if($data['code'] == 422 && !empty($this->controller->viewVars['error'])){
+	    	$data['error']		= 'Sono presenti degli errori di validazione';
 	    	$data['validation'] = $this->controller->viewVars['error']->getValidationErrors();
+	    }
 
 	    $this->controller->set('success', false);
 	    $this->controller->set('data', $data);
