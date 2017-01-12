@@ -2,6 +2,7 @@
 namespace Entheos\Utils\Error;
 
 use Cake\Error\ExceptionRenderer;
+use Cake\Collection\Collection;
 
 class ApiExceptionRenderer extends ExceptionRenderer
 {
@@ -16,7 +17,14 @@ class ApiExceptionRenderer extends ExceptionRenderer
 	    ];
 	    if($data['code'] == 422 && !empty($this->controller->viewVars['error'])){
 	    	$data['error']		= 'Sono presenti degli errori di validazione';
-	    	$data['validation'] = $this->controller->viewVars['error']->getValidationErrors();
+	    	$validationErrors = [];
+
+	    	foreach($this->controller->viewVars['error']->getValidationErrors() as $field => $errors)
+	    	{
+	    		foreach($errors as $rule => $message)
+	    			$validationErrors[] = ['field' => $field, 'rule' => $rule, 'message' => $message];
+    		}
+	    	$data['validation'] = $validationErrors;
 	    }
 
 	    $this->controller->set('success', false);
