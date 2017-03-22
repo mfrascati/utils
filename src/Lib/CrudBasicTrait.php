@@ -1,6 +1,8 @@
 <?php
 namespace Entheos\Utils\Lib;
 
+use Cake\Network\Exception\BadRequestException;
+
 /**
  * Trait for automation of basic CRUD operations
  * Depends on CakePHP CRUD plugin
@@ -56,6 +58,31 @@ trait CrudBasicTrait {
 	public function _findEntityById($id)
 	{
 	    return $this->_entityQuery($this->{$this->name}->find('all')->where([$this->name.'.id' => $id]), $id)->first();
+	}
+
+	/**
+	 * Controlla che la chiamata sia post 
+	 * @return void
+	 */
+	public function requirePost()
+	{
+		if(!$this->request->is('post'))
+		    throw new BadRequestException('Request has to be POST');
+	}
+
+	/**
+	 * Controlla che i campi obbligatori siano presenti
+	 * @param  array $fields 
+	 * @return bool
+	 */
+	public function requireFields($fields)
+	{
+		$this->requirePost();
+		
+		foreach($fields as $field) {
+			if(!$this->request->getData($field))
+				throw new BadRequestException("Campo obbligatorio: $field");
+		}
 	}
 
 	/**
