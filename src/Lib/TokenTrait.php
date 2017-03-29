@@ -32,13 +32,37 @@ trait TokenTrait {
 	    if (empty($user) || !(new DefaultPasswordHasher)->check($this->request->data('password'), $user->password))
 	        throw new UnauthorizedException(__('Nome utente o password non validi'));
 
+	    $this->__returnToken($user);
+	}
+
+	/**
+	 * Aggiorna il token dell'utente loggato (autenticato con token valido)
+	 * Restituisce unauhtorized se nel frattempo è stato modificato e 
+	 * non rispetta  più le condizioni per essere attivo
+	 * @return string Token
+	 */
+	public function refreshToken()
+	{
+	    $user = $this->Users->find()
+	    	->where(['id' => $this->Auth->user('id')])
+	    	->where($this->activeUserConditions)
+		    ->first();
+
+		if(empty($user))
+			throw new UnauthorizedException(__('Token non rinnovato'));
+
+		$this->__returnToken($user);
+	}
+
+	private function __returnToken($user)
+	{
 	    $this->set([
 	        'success' => true,
 	        'data' => [
 	            'user' => $user,
 	        ],
             'token' => $token = JWT::encode([
-                'sub' => $user['id'],
+                'sub' => $user->id,
                 'exp' =>  time() + 604800
             ],
             Security::salt()),
