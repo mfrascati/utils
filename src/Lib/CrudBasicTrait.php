@@ -2,6 +2,7 @@
 namespace Entheos\Utils\Lib;
 
 use Cake\Network\Exception\BadRequestException;
+use Cake\Core\Configure;
 
 /**
  * Trait for automation of basic CRUD operations
@@ -107,16 +108,27 @@ trait CrudBasicTrait {
 
 	/**
 	 * Scorciatoia per impostare le variabili success e data in view json
+	 * Per integrare la risposta con variabili aggiuntive è possibile definirle nell'app controller
+	 * Es. public $integrateResponseVars = ['emails' => 'EmailDrafts'];
+	 * Il valore verrà letto da Configure EmailDrafts e restituito sotto l'indice top level emails
 	 * @param boolean $success 
 	 * @param array  $data
 	 */
 	public function _setJson($success, $data = [])
 	{
-	    $this->set([
+		$res = [
 	        'success' => $success,
 	        'data' => $data,
-	        '_serialize' => ['success', 'data']
-	    ]); 
+	    ];
+
+	    if(!empty($this->integrateResponseVars))
+	    {
+	    	foreach($this->integrateResponseVars as $key => $var)
+	    		$res[$key] = Configure::read($var);
+	    }
+
+	    $res['_serialize'] = array_keys($res);
+	    $this->set($res); 
 	}
 
 	/**
