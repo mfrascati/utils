@@ -15,6 +15,12 @@ trait TokenTrait {
 	public $activeUserConditions = ['active' => true];
 
 	/**
+	 * Specifica un finder per aggiungere condizioni o contain aggiuntivi (Definire sulla UsersTable)
+	 * @var string
+	 */
+	public $userFinder = 'all';
+
+	/**
 	 * Verifica i dati di autenticazione dell'utente e se corretti restituisce 
 	 * il token per effettuare le chiamate
 	 * @return string Token
@@ -25,6 +31,7 @@ trait TokenTrait {
 	        throw new UnauthorizedException(__('Nome utente o password non impostati'));
 
 	    $user = $this->Users->find()
+	    	->find($this->userFinder)
 	    	->where(['username' => $this->request->data('username')])
 	    	->where($this->activeUserConditions)
 		    ->first();
@@ -32,6 +39,7 @@ trait TokenTrait {
 	    if (empty($user) || !(new DefaultPasswordHasher)->check($this->request->data('password'), $user->password))
 	        throw new UnauthorizedException(__('Nome utente o password non validi'));
 
+	    $this->__afterTokenValidatedCallback($user);
 	    $this->__returnToken($user);
 	}
 
@@ -44,6 +52,7 @@ trait TokenTrait {
 	public function refreshToken()
 	{
 	    $user = $this->Users->find()
+	    	->find($this->userFinder)
 	    	->where(['id' => $this->Auth->user('id')])
 	    	->where($this->activeUserConditions)
 		    ->first();
@@ -51,7 +60,19 @@ trait TokenTrait {
 		if(empty($user))
 			throw new UnauthorizedException(__('Token non rinnovato'));
 
+		$this->__afterTokenValidatedCallback($user);
 		$this->__returnToken($user);
+	}
+
+	/**
+	 * Definendo una funzione afterTokenValidated($user) su controller è possibile
+	 * definire logica custom 
+	 * @return void
+	 */
+	private function __afterTokenValidatedCallback($user)
+	{
+		if(method_exists($this, 'afterTokenValidated'))
+			return $this->afterTokenValidated($user);
 	}
 
 	private function __returnToken($user)
