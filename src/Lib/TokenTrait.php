@@ -32,7 +32,7 @@ trait TokenTrait {
 
 	    $user = $this->Users->find()
 	    	->find($this->userFinder)
-	    	->where(['username' => $this->request->data('username')])
+	    	->where(['Users.username' => $this->request->data('username')])
 	    	->where($this->activeUserConditions)
 		    ->first();
 
@@ -53,7 +53,7 @@ trait TokenTrait {
 	{
 	    $user = $this->Users->find()
 	    	->find($this->userFinder)
-	    	->where(['id' => $this->Auth->user('id')])
+	    	->where(['Users.id' => $this->Auth->user('id')])
 	    	->where($this->activeUserConditions)
 		    ->first();
 
