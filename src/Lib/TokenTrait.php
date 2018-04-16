@@ -2,7 +2,7 @@
 namespace Entheos\Utils\Lib;
 
 use Cake\Utility\Security;
-use Cake\Network\Exception\UnauthorizedException;
+use Cake\Http\Exception\UnauthorizedException;
 use Cake\Auth\DefaultPasswordHasher;
 use \Firebase\JWT\JWT;
 
@@ -27,16 +27,16 @@ trait TokenTrait {
 	 */
 	public function token()
 	{
-	    if (!$this->request->data('username') || !$this->request->data('password'))
+	    if (!$this->request->getData('username') || !$this->request->getData('password'))
 	        throw new UnauthorizedException(__('Nome utente o password non impostati'));
 
 	    $user = $this->Users->find()
 	    	->find($this->userFinder)
-	    	->where(['Users.username' => $this->request->data('username')])
+	    	->where(['Users.username' => $this->request->getData('username')])
 	    	->where($this->activeUserConditions)
 		    ->first();
 
-	    if (empty($user) || !(new DefaultPasswordHasher)->check($this->request->data('password'), $user->password))
+	    if (empty($user) || !(new DefaultPasswordHasher)->check($this->request->getData('password'), $user->password))
 	        throw new UnauthorizedException(__('Nome utente o password non validi'));
 
 	    $this->__afterTokenValidatedCallback($user);
@@ -86,7 +86,7 @@ trait TokenTrait {
                 'sub' => $user->id,
                 'exp' =>  time() + 604800
             ],
-            Security::salt()),
+            Security::getSalt()),
 	        '_serialize' => ['success', 'data', 'token']
 	    ]);
 	}
