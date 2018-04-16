@@ -42,7 +42,7 @@ trait FilterTrait {
 		if(empty($this->filterWhitelist))
 			throw new \Exception('Definire sul controller la proprietà public $filterWhitelist');
 
-		$this->paging = $this->request->data('paging');
+		$this->paging = $this->request->getParam('paging');
 		$this->request->data = Hash::flatten($this->request->data);
 		$this->whitelist = Hash::flatten($this->filterWhitelist);
 
