@@ -1,7 +1,7 @@
 <?php
 namespace Entheos\Utils\Lib;
 
-use Cake\Network\Exception\BadRequestException;
+use Cake\Http\Exception\BadRequestException;
 use Cake\Core\Configure;
 
 /**
@@ -93,7 +93,7 @@ trait CrudBasicTrait {
 	 */
 	public function _afterSave(\Cake\Event\Event $event)
 	{
-        $this->_setJson(true, $this->_findEntityById($event->subject->entity->id));
+        $this->_setJson(true, $this->_findEntityById($event->getSubject()->entity->id));
 	}
 
 	/**
@@ -103,7 +103,7 @@ trait CrudBasicTrait {
 	 */
 	public function _beforeFind(\Cake\Event\Event $event)
 	{
-	    $event->subject->query = $this->_entityQuery($event->subject->query, $event->subject->id);
+	    $event->getSubject()->query = $this->_entityQuery($event->getSubject()->query, $event->getSubject()->id);
 	}
 
 	/**

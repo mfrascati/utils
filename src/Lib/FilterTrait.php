@@ -43,10 +43,12 @@ trait FilterTrait {
 			throw new \Exception('Definire sul controller la proprietà public $filterWhitelist');
 
 		$this->paging = $this->request->getParam('paging');
-		$this->request->data = Hash::flatten($this->request->data);
+		$this->request->withParsedBody(Hash::flatten($this->request->getData()));
 		$this->whitelist = Hash::flatten($this->filterWhitelist);
 
-		foreach($this->request->data as $field=>$value)
+		$data = $this->request->getData();
+
+		foreach($data as $field=>$value)
 		{
 			// Se il campo non è accettato, lo rimuovo
 			// Se il campo è custom lo rimuovo dalle normali condizioni perché lo gestisco a mano
@@ -195,7 +197,7 @@ trait FilterTrait {
 	 */
 	private function __paginationData()
 	{
-	    $pagination = $this->request->paging[$this->modelClass];
+	    $pagination = $this->request->getParam('paging.'.$this->modelClass);
 	    $paginationResponse = [
 	        'page_count' => $pagination['pageCount'],
 	        'current_page' => $pagination['page'],
