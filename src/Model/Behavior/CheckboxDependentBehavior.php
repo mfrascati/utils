@@ -30,7 +30,7 @@ class CheckboxDependentBehavior extends Behavior
      */
 	public function checkedOrClear($entity)
 	{
-		$config = $this->config();
+		$config = $this->getConfig();
 		if(empty($config['fields']))
 			return $entity;
 
