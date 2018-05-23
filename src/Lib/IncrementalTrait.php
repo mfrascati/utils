@@ -18,7 +18,7 @@ trait IncrementalTrait {
 	    	->where($conditions)
 	    	->order([$fieldName => 'DESC'])
 	    	->select([$fieldName])
-	    	->hydrate(false)
+	    	->enableHydration(false)
 	    	->first();
 
 	    if(empty($max))
