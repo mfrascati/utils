@@ -1,7 +1,7 @@
 <?php
 namespace Entheos\Utils\Lib;
 
-use Cake\Http\Exception\BadRequestException;
+use Entheos\Utils\Exception\WarningException;
 use Cake\Core\Configure;
 
 /**
@@ -68,7 +68,7 @@ trait CrudBasicTrait {
 	public function requirePost()
 	{
 		if(!$this->request->is('post'))
-		    throw new BadRequestException('Request has to be POST');
+		    throw new WarningException('Request has to be POST');
 	}
 
 	/**
@@ -82,7 +82,7 @@ trait CrudBasicTrait {
 		
 		foreach($fields as $field) {
 			if(!$this->request->getData($field))
-				throw new BadRequestException("Campo obbligatorio: $field");
+				throw new WarningException("Campo obbligatorio: $field");
 		}
 	}
 
