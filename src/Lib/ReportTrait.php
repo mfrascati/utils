@@ -99,12 +99,13 @@ trait ReportTrait
 		$this->reportFields = (new Collection($fields))
 		->map(function($tmp){
 			list($model, $field) = $this->__splitModelField($tmp[0]);
-			$r = ['field' => $tmp[0], 'tableField' => $model.'.'.$field] + ($tmp[1] ?? []);
+			$fieldNameOriginal = $tmp[0];
+			$r = ['field' => $this->__toAliasedFieldName($fieldNameOriginal), 'tableField' => $model.'.'.$field] + ($tmp[1] ?? []);
 			if(!empty($this->reportTypeMap[$r['tableField']]))
 				$r['type'] = $this->__mapType($this->reportTypeMap[$r['tableField']]);
 			else
 				$r['type'] = 'string'; // E' un virtual quindi
-			if(!isset($r['label']))			$r['label']			= $this->__getNiceName($r['field']); // Sovrascrivibile con 'alias'
+			if(!isset($r['label']))			$r['label']			= $this->__getNiceName($fieldNameOriginal); // Sovrascrivibile con 'alias'
 			if(!isset($r['description']))	$r['description']	= '';
 			if(!isset($r['select']))		$r['select'] 		= true;
 			if(!isset($r['where']))			$r['where'] 		= $model == $this->tableName && empty($r['virtual']);
@@ -116,6 +117,16 @@ trait ReportTrait
 		});
 
 		$this->__setHelperVars();
+	}
+
+	private function __toAliasedFieldName($field)
+	{
+		return str_replace('.', '__', $field);
+	}
+
+	private function __toDbFieldName($field)
+	{
+		return str_replace('__', '.', $field);
 	}
 
 	public function getReportFieldsForFrontend()
@@ -162,7 +173,7 @@ trait ReportTrait
 	private function __getNiceName($fieldName)
 	{
 		list($model, $field) = $this->__splitModelField($fieldName, 'full');
-		return $this->reportModels[$model] . ' ' . Inflector::humanize($field);
+		return ($this->tableName != $model ? $this->reportModels[$model] . ' ' : '') . Inflector::humanize($field);
 	}
 
 	/**
@@ -174,14 +185,15 @@ trait ReportTrait
 	 * 
 	 * @param  string $field 
 	 * @param  string $mode simple|full 
+	 * @param  string $separator .|__
 	 * @return array [model, field]
 	 */
-	private function __splitModelField($field, $mode = 'simple')
+	private function __splitModelField($field, $mode = 'simple', $separator = '.')
 	{
-		$pos = strrpos($field, '.');
+		$pos = strrpos($field, $separator);
 		$model = substr($field, 0, $pos);
 		if($mode != 'full'){
-			$pos2 = strrpos($model, '.');
+			$pos2 = strrpos($model, $separator);
 			$model = substr($model, $pos2 !== false ? $pos2+1 : 0);
 		}
 
