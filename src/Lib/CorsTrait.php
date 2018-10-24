@@ -7,11 +7,14 @@ namespace Entheos\Utils\Lib;
  */
 trait CorsTrait {
 
-	public function setCorsHeaders()
+	public function setCorsHeaders($allowedOrigin = null)
 	{
+		if(empty($allowedOrigin))
+			$allowedOrigin = \Cake\Routing\Router::fullBaseUrl();
+	    header("Access-Control-Allow-Origin: $allowedOrigin");
+
 		// Allow from any origin
 		if (isset($_SERVER['HTTP_ORIGIN'])) {
-		    header("Access-Control-Allow-Origin: " . \Cake\Routing\Router::fullBaseUrl());
 		    header('Access-Control-Allow-Credentials: true');
 		    header('Access-Control-Max-Age: 86400');    // cache for 1 day
 		}
