@@ -109,7 +109,7 @@ trait ReportTrait
 			if(!isset($r['description']))	$r['description']	= '';
 			if(!isset($r['select']))		$r['select'] 		= true;
 			if(!isset($r['where']))			$r['where'] 		= $model == $this->tableName && empty($r['virtual']);
-			if(!isset($r['order']))			$r['order'] 		= false;
+			if(!isset($r['order']))			$r['order'] 		= $model == $this->tableName && empty($r['virtual']);
 			if(!isset($r['virtual']))		$r['virtual'] 		= false;
 			if(!isset($r['lookup']))		$r['lookup'] 		= false;
 
