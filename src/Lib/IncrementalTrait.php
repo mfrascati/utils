@@ -24,7 +24,7 @@ trait IncrementalTrait {
 	    if(empty($max))
 	        return 1;
 
-	    return $max[$fieldName] + 1;
+	    return (int)$max[$fieldName] + 1;
 	}
 
 }
