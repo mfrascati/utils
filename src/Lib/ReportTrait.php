@@ -204,16 +204,18 @@ trait ReportTrait
 	/**
 	 * Costruisce il where della query.
 	 * Si assicura prima che il campo filtrabile e che l'operatore passato sia adatto al campo
-	 * @param  array $fields  strutturato in [['nome campo' => ['operator' => 'EQUAL', 'value' => 'XXX']], ecc..]
+	 * @param  array $fields  strutturato in [['field' => ['name' => nome campo'], 'operator' => 'EQUAL', 'value' => 'XXX']], ecc..]
 	 * @return void
 	 */
 	private function __buildWhere($fields)
 	{
 		foreach($fields as $field)
 		{
-			if(!isset($field['field']) || !isset($field['operator']) || !isset($field['value']))
+			if(!isset($field['field']['name']) || !isset($field['operator']) || !isset($field['value']))
 				throw new WarningException("L'array di ricerca deve contentere gli indici: field, operator, value");
-				
+
+			$field['field'] = $field['field']['name'];
+
 			if(!in_array($field['field'], $this->whereable))
 				throw new WarningException("Non è permesso impostare filtri sul campo '$field[field]'");
 
@@ -224,7 +226,7 @@ trait ReportTrait
 			if(!$this->__isValidWhereOperators($field['operator'], $type))
 				throw new WarningException("Operatore '$field[operator]' non valido per il campo '$field[field]'");
 
-			$f = $field['field'];
+			$f = $this->__toDbFieldName($field['field']);
 			$v = $field['value'];
 
 			switch($field['operator'])
@@ -276,9 +278,16 @@ trait ReportTrait
 			// debug($this->query);
 	}
 
-	private function __buildOrder()
+	private function __buildOrder($fields)
 	{
+		$order = [];
+		foreach($fields as $field)
+		{
+			$field['field'] = $this->__toDbFieldName($field['field']);
+			$order[$field['field']] = $field['operator'];
+		}
 
+		return $this->query->order($order);
 	}
 
 	/**
@@ -295,6 +304,7 @@ trait ReportTrait
 
 		    	foreach($selectFields as $field) {
 		    		// logd($field['field']);
+		    		$field = $this->__toDbFieldName($field);
 		    		list($model, $fieldName) =  $this->__splitModelField($field['field'], 'full');
 		    		$path = (new Collection(explode('.', $model)))
 		    			->reject(function($val){ 
