@@ -284,7 +284,7 @@ trait ReportTrait
 		foreach($fields as $field)
 		{
 			$field['field'] = $this->__toDbFieldName($field['field']);
-			$order[$field['field']] = $field['operator'];
+			$order[$field['field']] = $field['direction'];
 		}
 
 		return $this->query->order($order);
