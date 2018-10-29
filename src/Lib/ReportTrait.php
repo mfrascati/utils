@@ -103,7 +103,7 @@ trait ReportTrait
 			$r = ['field' => $this->__toAliasedFieldName($fieldNameOriginal), 'tableField' => $model.'.'.$field] + ($tmp[1] ?? []);
 			if(!empty($this->reportTypeMap[$r['tableField']]))
 				$r['type'] = $this->__mapType($this->reportTypeMap[$r['tableField']]);
-			else
+			elseif(empty($r['type']))
 				$r['type'] = 'string'; // E' un virtual quindi
 			if(!isset($r['label']))			$r['label']			= $this->__getNiceName($fieldNameOriginal); // Sovrascrivibile con 'alias'
 			if(!isset($r['description']))	$r['description']	= '';
