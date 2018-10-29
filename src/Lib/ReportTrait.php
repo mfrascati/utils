@@ -15,12 +15,15 @@ use Cake\Utility\Inflector;
 trait ReportTrait
 {
 	protected $tableName;
-	protected $reportModels = [];
-	protected $reportFields = null;
-	protected $selectable	= [];
-	protected $whereable	= [];
-	protected $orderable	= [];
-	protected $reportWarnings = [];
+	protected $reportModels		= [];
+	protected $reportFields		= null;
+	protected $selectable		= [];
+	protected $whereable		= [];
+	protected $orderable		= [];
+	protected $reportHeaders	= [];
+	protected $reportData		= [];
+	protected $reportWarnings	= [];
+	protected $cachedTypes		= [];
 
 	/**
 	 * Genera il report custom
@@ -35,20 +38,90 @@ trait ReportTrait
 	 */
 	public function generateReport($params)
 	{
+		$return = 'data'; // 'data'|'download';
 		if(empty($this->reportFields))
 			throw new ErrorException("Campi report non definiti");
+
+		ini_set('memory_limit','450M');
 
 		// debug($this->reportFields->toArray());
 		// debug($params) ;
 
-		$this->query = $this->find()->find('report')->enableAutofields(true);
+		$containedModels = $this->__getContainedModels($params['select']);
+		$this->query = $this->find()->contain($containedModels)->enableAutofields(true);
+		// $this->query->getConnection()->logQueries(true);
 
 		$this->__buildWhere($params['where']);
 		$this->__buildOrder($params['order']);
-		$data = $this->__execute($params['select']);
-		$headers = $this->__getHeaders($params['select']);
+		$this->__getHeaders($params['select']);
+		$this->__execute($params['select']);
+		// logd($this->reportData);
 
-		return compact('data', 'headers');
+		// return ['data' => $this->reportData, 'headers' => $this->reportHeaders];
+	}
+
+	public function getReportData()
+	{
+		return $this->reportData;
+	}
+
+	public function getReportHeaders()
+	{
+		return $this->reportHeaders;
+	}
+
+	public function getExcel()
+	{
+		$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+		$worksheet = $spreadsheet->getActiveSheet();
+
+		$worksheet->fromArray($this->reportHeaders, null, 'A1');
+		$row = 2;
+
+		foreach($this->reportData as $r)
+		{
+			// debug($r);
+		    $worksheet->fromArray($r, null, 'A'.$row);
+		    $row++;
+		}
+
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+        $writer->save('php://output');
+
+        // In controller usa prima della chiamata
+        
+        // $this->autoRender = false;
+        // ob_start();
+
+        // Dopo la chiamata
+        // 
+        // $response = $this->response
+        //     ->withType('xls')
+        //     ->withDownload('nomeFile.xls')
+        //     ->withDisabledCache()
+        //     ->withStringBody(ob_get_clean());
+
+        // return $response;
+	}
+
+	/**
+	 * Recupera dinamicamente i model per la contain, escludendo quello del model principale
+	 * Non posso limitare dinamicamente i campi in select per via dei virtual!
+	 * @param  array $selected 
+	 * @return array
+	 */
+	public function __getContainedModels($selected)
+	{
+		// debug($selected);
+		$models = array_unique(array_map(function($r){
+			return $this->__splitModelField($this->__toDbFieldName($r['field']), 'full')[0];
+		}, $selected));
+
+		$models = array_filter($models, function($r){
+			return $r != $this->tableName;
+		});
+
+		return $models;
 	}
 
 	/**
@@ -297,15 +370,15 @@ trait ReportTrait
 	 */
 	private function __execute($selectFields)
 	{
-		return $this->query
+		$this->reportData = $this->query
 		->formatResults(function ($results) use ($selectFields) {
 		    return $results->map(function ($row) use ($selectFields) {
 		    	$a = [];
 
 		    	foreach($selectFields as $field) {
 		    		// logd($field['field']);
-		    		$field = $this->__toDbFieldName($field);
-		    		list($model, $fieldName) =  $this->__splitModelField($field['field'], 'full');
+		    		// $field = $this->__toDbFieldName($field);
+		    		list($model, $fieldName) =  $this->__splitModelField($this->__toDbFieldName($field['field']), 'full');
 		    		$path = (new Collection(explode('.', $model)))
 		    			->reject(function($val){ 
 		    				return $val == $this->tableName;
@@ -317,9 +390,15 @@ trait ReportTrait
 		    		$path[] = $fieldName;
 		    		$walker = $row;
 		    		foreach ($path as $property){
+			    		if(!isset($walker->{$property}))
+			    		{
+			    			$walker = null;
+			    			continue;
+			    		}
 		    			$walker = $walker->{$property};
 		    		}
-		    		$a[] = $walker;
+		    		$value = $this->__processValueWithType($field['field'], $walker);
+		    		$a[] = $value;
 		    	}
 
 		    	return $a;
@@ -336,6 +415,36 @@ trait ReportTrait
 	}
 
 	/**
+	 * Converte il valore a seconda del tipo di dato
+	 * @param  string $field 
+	 * @param  mixed $value 
+	 * @return string
+	 */
+	private function __processValueWithType($field, $value)
+	{
+		if(isset($this->cachedTypes[$field]))
+			$type = $this->cachedTypes[$field];
+		else {
+			$type = $this->__getField($field)['type'];
+			$this->cachedTypes[$field] = $type;
+		}
+		// debug($field); debug($type);
+		
+		if($type == 'date')
+			return empty($value) ? $value : $value->format('d/m/Y');
+		elseif($type == 'boolean')
+		{
+			if($value === true)
+				return 'SI';
+			elseif($value === false)
+				return 'NO';
+			return $value;
+		}
+
+		return $value;
+	}
+
+	/**
 	 * Costruisce gli headers del report, iterando i campi impostati in select
 	 * Se è stato impostato 'alias' restituisce quello, altrimenti la label da config
 	 * @param  array $selectFields 
@@ -343,15 +452,14 @@ trait ReportTrait
 	 */
 	private function __getHeaders($selectFields)
 	{
-		$headers = [];
 		foreach($selectFields as $field) 
 		{
-			if(!empty($field['alias']))
-				$headers[] = $field['alias'];
+			if(!empty($field['label']))
+				$this->reportHeaders[] = $field['label'];
 			else
-				$headers[] = $this->__getField($field['field'])['label'];
+				$this->reportHeaders[] = $this->__getField($field['field'])['label'];
 		}
-		return $headers;
+		// debug($this->reportHeaders);
 	}
 
 	/**
