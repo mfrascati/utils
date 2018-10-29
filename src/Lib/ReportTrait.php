@@ -21,6 +21,7 @@ trait ReportTrait
 	protected $whereable		= [];
 	protected $orderable		= [];
 	protected $reportHeaders	= [];
+	protected $reportHeaderTypes = [];
 	protected $reportData		= [];
 	protected $reportWarnings	= [];
 	protected $cachedTypes		= [];
@@ -76,14 +77,48 @@ trait ReportTrait
 		$worksheet = $spreadsheet->getActiveSheet();
 
 		$worksheet->fromArray($this->reportHeaders, null, 'A1');
-		$row = 2;
+		$rowIdx = 2;
 
 		foreach($this->reportData as $r)
 		{
 			// debug($r);
-		    $worksheet->fromArray($r, null, 'A'.$row);
-		    $row++;
+		    $worksheet->fromArray($r, null, 'A'.$rowIdx);
+		    $rowIdx++;
 		}
+
+		$n = 0;
+		foreach($this->reportHeaderTypes as $type)
+		{
+			$n++;
+			$colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($n);
+			
+			if(in_array($type, ['string', 'boolean', 'date']))
+				continue;
+
+			$range = $colIdx.'1:'.$colIdx.$rowIdx;
+
+			if($type == 'integer'){
+				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
+				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+			}
+			elseif($type == 'decimal'){
+				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
+				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+			}
+		}
+
+		$styleArray = [
+		    'font' => [
+		        'bold' => true,
+		    ],
+		    'borders' => [
+		        'bottom' => [
+		            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+		        ],
+		    ],
+		];
+
+		$spreadsheet->getActiveSheet()->getStyle('A1:'.$colIdx.'1')->applyFromArray($styleArray);
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
         $writer->save('php://output');
@@ -219,7 +254,8 @@ trait ReportTrait
 	 * - boolean
 	 * - string
 	 * - date
-	 * - number
+	 * - integer
+	 * - decimal
 	 * 
 	 * @param  string $type 
 	 * @return string
@@ -228,8 +264,10 @@ trait ReportTrait
 	{
 		if(in_array($type, ['string', 'boolean']))
 			return $type;
-		if(in_array($type, ['integer', 'decimal', 'float', 'tinyinteger']))
-			return 'number';
+		if(in_array($type, ['integer', 'tinyinteger']))
+			return 'integer';
+		if(in_array($type, ['decimal', 'float']))
+			return 'decimal';
 		if(in_array($type, ['date', 'datetime']))
 			return 'date';
 		else
@@ -454,6 +492,8 @@ trait ReportTrait
 	{
 		foreach($selectFields as $field) 
 		{
+			$this->reportHeaderTypes[$field['field']] = $this->__getField($field['field'])['type'];
+
 			if(!empty($field['label']))
 				$this->reportHeaders[] = $field['label'];
 			else
