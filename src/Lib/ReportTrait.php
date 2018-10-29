@@ -91,7 +91,7 @@ trait ReportTrait
 		{
 			$n++;
 			$colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($n);
-			
+
 			if(in_array($type, ['string', 'boolean', 'date']))
 				continue;
 
@@ -492,12 +492,13 @@ trait ReportTrait
 	{
 		foreach($selectFields as $field) 
 		{
-			$this->reportHeaderTypes[$field['field']] = $this->__getField($field['field'])['type'];
+			$f = $this->__getField($field['field']);
+			$this->reportHeaderTypes[$field['field']] = $f['type'];
 
 			if(!empty($field['label']))
 				$this->reportHeaders[] = $field['label'];
 			else
-				$this->reportHeaders[] = $this->__getField($field['field'])['label'];
+				$this->reportHeaders[] = $f['label'];
 		}
 		// debug($this->reportHeaders);
 	}
