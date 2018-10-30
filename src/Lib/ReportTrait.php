@@ -322,8 +322,8 @@ trait ReportTrait
 	{
 		foreach($fields as $field)
 		{
-			if(!isset($field['field']['name']) || !isset($field['operator']) || !isset($field['value']))
-				throw new WarningException("L'array di ricerca deve contentere gli indici: field, operator, value");
+			if(!isset($field['field']['name']) || !isset($field['operator']))
+				throw new WarningException("L'array di ricerca deve contentere gli indici: field, operator");
 
 			$field['field'] = $field['field']['name'];
 
