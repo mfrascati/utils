@@ -17,6 +17,7 @@ trait ReportTrait
 	protected $tableName;
 	protected $reportModels		= [];
 	protected $reportFields		= null;
+	protected $dependentFields  = [];
 	protected $selectable		= [];
 	protected $whereable		= [];
 	protected $orderable		= [];
@@ -156,6 +157,12 @@ trait ReportTrait
 			return $r != $this->tableName;
 		});
 
+		// Gestisce model dipendenti
+		array_walk($selected, function($r) use (&$models){
+			if(!empty($this->dependentFields[$r['field']]) && !in_array($this->dependentFields[$r['field']] ,$models))
+				$models[] = $this->dependentFields[$r['field']];
+		});
+
 		return $models;
 	}
 
@@ -191,6 +198,7 @@ trait ReportTrait
 	 * - where = Se la query è filtrabile per questo campo
 	 * - virtual = Se è un campo virtual ( serve ad escludere il campo dai where e per individuarlo meglio )
 	 * - lookup = Se in automatico il valore da mostrare all'utente viene integrato col name della lookup passata
+	 * - dependsOn = Se dipende da un model diverso dal proprio (Es, telefono è un virtual che dipende da una hasMany)
 	 * 
 	 * @param void
 	 */
@@ -220,9 +228,15 @@ trait ReportTrait
 			if(!isset($r['order']))			$r['order'] 		= $model == $this->tableName && empty($r['virtual']);
 			if(!isset($r['virtual']))		$r['virtual'] 		= false;
 			if(!isset($r['lookup']))		$r['lookup'] 		= false;
+			if(!isset($r['dependsOn']))		$r['dependsOn'] 	= null;
 
 			return $r;
 		});
+
+		$this->dependentFields = $this->reportFields
+			->filter(function($r){return $r['dependsOn'];})
+			->combine('field', 'dependsOn')
+			->toArray();
 
 		$this->__setHelperVars();
 	}
