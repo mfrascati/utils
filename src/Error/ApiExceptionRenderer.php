@@ -34,7 +34,7 @@ class ApiExceptionRenderer extends ExceptionRenderer
 	    	$errorString = '<ul style="padding-left: 20px;">';
 	    	foreach($validationErrors as $error)
 	    	{
-	    		$errorString .= "<li><b>$error[field]</b> - $message</li>";
+	    		$errorString .= "<li><b>$error[field]</b> - $error[message]</li>";
 	    	}
 	    	$errorString .= '</ul>';
 
