@@ -10,6 +10,8 @@ use Cake\Core\Configure;
  */
 trait CrudBasicTrait {
 
+	protected $_responseWarnings = [];
+
 	/**
 	 * Basic add callback
 	 * If you need to extend the function just copy the function in your controller
@@ -117,8 +119,9 @@ trait CrudBasicTrait {
 	public function _setJson($success, $data = [])
 	{
 		$res = [
-	        'success' => $success,
-	        'data' => $data,
+			'success'	=> $success,
+			'data'		=> $data,
+			'warnings'	=> $this->_responseWarnings,
 	    ];
 
 	    if(!empty($this->integrateResponseVars))
@@ -131,6 +134,11 @@ trait CrudBasicTrait {
 	    $this->set($res); 
 	}
 
+	public function _setResponseWarning($message)
+	{
+		$this->_responseWarnings[] = $message;
+	}
+
 	/**
 	 * Scorciatoia per impostare le variabili success e data[message, code] in view json
 	 * @param boolean $success 
@@ -139,9 +147,10 @@ trait CrudBasicTrait {
 	public function _setError($message, $code = 500)
 	{
 	    $this->set([
-	        'success' => false,
-	        'data' => ['message' => $message, 'code' => $code],
-	        '_serialize' => ['success', 'data']
+			'success'		=> false,
+			'data'			=> ['message' => $message, 'code' => $code],
+			'warnings'		=> $this->_responseWarnings,
+			'_serialize'	=> ['success', 'data']
 	    ]); 
 	}
 }
