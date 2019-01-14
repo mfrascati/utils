@@ -114,13 +114,13 @@ class FatturaElettronica {
 
 		if($this->invoice->ritenuta != 0)
 		{
-			$data['DatiGenerali']['DatiRitenuta'] = [
+			$data['DatiGenerali']['DatiGeneraliDocumento']['DatiRitenuta'] = [
 				'ImportoRitenuta' => $this->__toDecimal($this->invoice->ritenuta),
 				'AliquotaRitenuta' => $this->__toDecimal($this->invoice->coefficiente_ritenuta),
 			];
 		}
 		else
-			unset($data['DatiGenerali']['DatiRitenuta']);
+			unset($data['DatiGenerali']['DatiGeneraliDocumento']['DatiRitenuta']);
 
 		return $data;
 	}
