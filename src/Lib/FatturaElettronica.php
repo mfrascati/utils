@@ -115,6 +115,7 @@ class FatturaElettronica {
 		if($this->invoice->ritenuta != 0)
 		{
 			$data['DatiGenerali']['DatiGeneraliDocumento']['DatiRitenuta'] = [
+				'TipoRitenuta' => 'RT02', // Persone giuridiche
 				'ImportoRitenuta' => $this->__toDecimal($this->invoice->ritenuta),
 				'AliquotaRitenuta' => $this->__toDecimal($this->invoice->coefficiente_ritenuta),
 			];
