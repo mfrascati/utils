@@ -118,6 +118,7 @@ class FatturaElettronica {
 				'TipoRitenuta' => 'RT02', // Persone giuridiche
 				'ImportoRitenuta' => $this->__toDecimal($this->invoice->ritenuta),
 				'AliquotaRitenuta' => $this->__toDecimal($this->invoice->coefficiente_ritenuta / 100),
+				'CausalePagamento' => 'U',
 			];
 		}
 		else
