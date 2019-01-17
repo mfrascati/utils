@@ -64,7 +64,8 @@ class FatturaElettronica {
 			],
 			'CessionarioCommittente' => [ // Cliente
 				'DatiAnagrafici' => [
-					'CodiceFiscale' => $this->invoice->client->codice_fiscale_fe,
+					'IdFiscaleIVA' => null,
+					'CodiceFiscale' => null,
 					'Anagrafica' => [
 						'Denominazione' => $this->invoice->client->ragione_sociale,
 					],
@@ -81,6 +82,19 @@ class FatturaElettronica {
 
 		if(empty($data['DatiTrasmissione']['PECDestinatario']))
 			unset($data['DatiTrasmissione']['PECDestinatario']);
+
+		if($this->invoice->client->partita_iva){
+			$data['CessionarioCommittente']['DatiAnagrafici']['IdFiscaleIVA'] = [
+				'IdPaese' => 'IT',
+				'IdCodice' => $this->invoice->client->partita_iva,
+			];
+			unset($data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale']);
+		}
+		else
+		{
+			$data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale'] = $this->invoice->client->codice_fiscale;
+			unset($data['CessionarioCommittente']['DatiAnagrafici']['IdFiscaleIVA']);
+		}
 
 		return $data;
 	}
@@ -192,11 +206,6 @@ class FatturaElettronica {
 
 		if(empty($e->causale))
 			$e->causale = $e->invoice_lines[0]->descrizione;
-
-		if($e->client->partita_iva)
-			$e->client->codice_fiscale_fe = $e->client->partita_iva;
-		else
-			$e->client->codice_fiscale_fe = $e->client->codice_fiscale;
 
 		if(empty($e->client->codice_destinatario_fe))
 			$e->client->codice_destinatario_fe = '0000000'; // - ‘0000000’, nei casi di fattura destinata ad un soggetto per il quale non si conosce il canale telematico (PEC o altro) sul quale recapitare il file.
