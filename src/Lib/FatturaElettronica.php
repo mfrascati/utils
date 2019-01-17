@@ -83,16 +83,21 @@ class FatturaElettronica {
 		if(empty($data['DatiTrasmissione']['PECDestinatario']))
 			unset($data['DatiTrasmissione']['PECDestinatario']);
 
-		if($this->invoice->client->partita_iva){
+		$client = $this->invoice->client;
+		if($client->partita_iva){
 			$data['CessionarioCommittente']['DatiAnagrafici']['IdFiscaleIVA'] = [
 				'IdPaese' => 'IT',
-				'IdCodice' => $this->invoice->client->partita_iva,
+				'IdCodice' => $client->partita_iva,
 			];
-			unset($data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale']);
+			
+			if(!empty($client->codice_fiscale) && $client->codice_fiscale != $client->partita_iva)
+				$data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale'] = $client->codice_fiscale;
+			else
+				unset($data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale']);
 		}
 		else
 		{
-			$data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale'] = $this->invoice->client->codice_fiscale;
+			$data['CessionarioCommittente']['DatiAnagrafici']['CodiceFiscale'] = $client->codice_fiscale;
 			unset($data['CessionarioCommittente']['DatiAnagrafici']['IdFiscaleIVA']);
 		}
 
