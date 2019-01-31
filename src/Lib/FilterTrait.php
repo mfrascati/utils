@@ -115,7 +115,7 @@ trait FilterTrait {
 		{
 			case 'like' :
 				if(!empty($value))
-					return $query->where(["$key LIKE" => "%$value%"]);
+					return $query->where(["$key LIKE" => "%$value%"], [$key => 'string']);
 				break;
 
 			case 'integer' :
