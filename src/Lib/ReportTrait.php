@@ -50,7 +50,7 @@ trait ReportTrait
 		// debug($params) ;
 
 		$containedModels = $this->__getContainedModels($params['select']);
-		$this->query = $this->find()->contain($containedModels)->enableAutofields(true);
+		$this->query = $this->find()->contain($containedModels)->enableAutoFields(true);
 		// $this->query->getConnection()->logQueries(true);
 
 		$this->__buildWhere($params['where']);
