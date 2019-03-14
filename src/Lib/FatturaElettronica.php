@@ -75,7 +75,7 @@ class FatturaElettronica {
 					'CAP' => $this->invoice->client->cap,
 					'Comune' => $this->invoice->client->citta,
 					'Provincia' => $this->invoice->client->provincia,
-					'Nazione' => 'IT',
+					'Nazione' => $this->invoice->client->nazione,
 				],
 			],
 		];
