@@ -86,7 +86,7 @@ class FatturaElettronica {
 		$client = $this->invoice->client;
 		if($client->partita_iva){
 			$data['CessionarioCommittente']['DatiAnagrafici']['IdFiscaleIVA'] = [
-				'IdPaese' => 'IT',
+				'IdPaese' => $client->nazione,
 				'IdCodice' => $client->partita_iva,
 			];
 			
