@@ -106,6 +106,10 @@ trait ReportTrait
 				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
 				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 			}
+			elseif($type == 'date'){
+				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
+				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDDSLASH);
+			}
 		}
 
 		$styleArray = [
@@ -121,7 +125,7 @@ trait ReportTrait
 
 		$spreadsheet->getActiveSheet()->getStyle('A1:'.$colIdx.'1')->applyFromArray($styleArray);
 
-        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xls');
+        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
 
         // In controller usa prima della chiamata
@@ -483,7 +487,7 @@ trait ReportTrait
 		// debug($field); debug($type);
 		
 		if($type == 'date')
-			return empty($value) ? $value : $value->format('d/m/Y');
+			return empty($value) ? $value : $value->format('Y-m-d');
 		elseif($type == 'boolean')
 		{
 			if($value === true)
