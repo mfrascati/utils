@@ -74,6 +74,7 @@ trait ReportTrait
 
 	public function getExcel()
 	{
+		\PhpOffice\PhpSpreadsheet\Cell\Cell::setValueBinder( new \PhpOffice\PhpSpreadsheet\Cell\AdvancedValueBinder() );
 		$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 		$worksheet = $spreadsheet->getActiveSheet();
 
@@ -93,7 +94,7 @@ trait ReportTrait
 			$n++;
 			$colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($n);
 
-			if(in_array($type, ['string', 'boolean', 'date']))
+			if(in_array($type, ['string', 'boolean']))
 				continue;
 
 			$range = $colIdx.'1:'.$colIdx.$rowIdx;
@@ -108,7 +109,7 @@ trait ReportTrait
 			}
 			elseif($type == 'date'){
 				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
-				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDDSLASH);
+				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_DDMMYYYY);
 			}
 		}
 
