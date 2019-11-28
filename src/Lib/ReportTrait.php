@@ -83,34 +83,46 @@ trait ReportTrait
 
 		foreach($this->reportData as $r)
 		{
-			// debug($r);
-		    $worksheet->fromArray($r, null, 'A'.$rowIdx);
+			// logd($r);
+
+			$colIdx = 1;
+			foreach($this->reportHeaderTypes as $type)
+			{
+				$colRef = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIdx);
+				$cell = $colRef.$rowIdx;
+				$val = $r[$colIdx-1];
+				$colIdx++;
+
+				if($type == 'string_forced'){
+					$spreadsheet->getActiveSheet()->setCellValueExplicit(
+						$cell, $val, \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+					);
+					continue;
+				}
+
+				$spreadsheet->getActiveSheet()->setCellValue($cell, $val);
+
+				if(in_array($type, ['string', 'boolean'])){
+					continue;
+				}
+				elseif($type == 'integer'){
+					$spreadsheet->getActiveSheet()->getStyle($cell)->getNumberFormat()
+								->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+				}
+				if($type == 'integer'){
+					$spreadsheet->getActiveSheet()->getStyle($cell)->getNumberFormat()
+						->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
+				}
+				elseif($type == 'decimal'){
+					$spreadsheet->getActiveSheet()->getStyle($cell)->getNumberFormat()
+						->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+				}
+				elseif($type == 'date'){
+					$spreadsheet->getActiveSheet()->getStyle($cell)->getNumberFormat()
+						->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_DDMMYYYY);
+				}
+			}
 		    $rowIdx++;
-		}
-
-		$n = 0;
-		foreach($this->reportHeaderTypes as $type)
-		{
-			$n++;
-			$colIdx = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($n);
-
-			if(in_array($type, ['string', 'boolean']))
-				continue;
-
-			$range = $colIdx.'1:'.$colIdx.$rowIdx;
-
-			if($type == 'integer'){
-				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
-				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER);
-			}
-			elseif($type == 'decimal'){
-				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
-				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-			}
-			elseif($type == 'date'){
-				$spreadsheet->getActiveSheet()->getStyle($range)->getNumberFormat()
-				    ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_DDMMYYYY);
-			}
 		}
 
 		$styleArray = [
@@ -124,7 +136,7 @@ trait ReportTrait
 		    ],
 		];
 
-		$spreadsheet->getActiveSheet()->getStyle('A1:'.$colIdx.'1')->applyFromArray($styleArray);
+		$spreadsheet->getActiveSheet()->getStyle('A1:'.$colRef.'1')->applyFromArray($styleArray);
 
         $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
         $writer->save('php://output');
@@ -222,7 +234,7 @@ trait ReportTrait
 			list($model, $field) = $this->__splitModelField($tmp[0]);
 			$fieldNameOriginal = $tmp[0];
 			$r = ['field' => $this->__toAliasedFieldName($fieldNameOriginal), 'tableField' => $model.'.'.$field] + ($tmp[1] ?? []);
-			if(!empty($this->reportTypeMap[$r['tableField']]))
+			if(!empty($this->reportTypeMap[$r['tableField']]) && empty($r['type']))
 				$r['type'] = $this->__mapType($this->reportTypeMap[$r['tableField']]);
 			elseif(empty($r['type']))
 				$r['type'] = 'string'; // E' un virtual quindi
