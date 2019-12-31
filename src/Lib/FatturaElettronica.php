@@ -131,6 +131,10 @@ class FatturaElettronica {
 			],
 		];
 
+		if(!empty($this->invoice->iban)) {
+			$data['DatiPagamento']['DettaglioPagamento']['IBAN'] = $this->invoice->iban;
+		}
+
 		if($this->invoice->ritenuta != 0)
 		{
 			$data['DatiGenerali']['DatiGeneraliDocumento']['DatiRitenuta'] = [
