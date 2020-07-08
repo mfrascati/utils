@@ -15,19 +15,16 @@ class SentryErrorContext implements EventListenerInterface
 
     public function setContext(Event $event)
     {
-        $request = $event->getSubject()->getRequest();
-        $request->trustProxy = true;
-        $raven = $event->getSubject()->getRaven();
-        $raven->user_context([
-            'username' => \Cake\Core\Configure::read('GlobalAuth.username'),
-            'ip_address' => $request->clientIp()
-        ]);
-
-        $extra = [];
-
-        if(PHP_SAPI === 'cli')
-            $extra = ['cli' => true];
-
-        return ['extra' => $extra];
+        if (PHP_SAPI !== 'cli') {
+            $request = $event->getSubject()->getRequest();
+            $request->trustProxy = true;
+            $raven = $event->getSubject()->getRaven();
+            $raven->user_context([
+                'username' => \Cake\Core\Configure::read('GlobalAuth.username'),
+                'ip_address' => $request->clientIp()
+            ]);
+        } else {
+            return ['cli' => true];
+        }
     }
 }
