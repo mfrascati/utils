@@ -3,6 +3,11 @@ namespace Entheos\Utils\Error;
 
 use Cake\Event\Event;
 use Cake\Event\EventListenerInterface;
+use Cake\Http\ServerRequest;
+use Cake\Http\ServerRequestFactory;
+use Sentry\State\Scope;
+
+use function Sentry\configureScope as sentryConfigureScope;
 
 class SentryErrorContext implements EventListenerInterface
 {
@@ -15,19 +20,26 @@ class SentryErrorContext implements EventListenerInterface
 
     public function setContext(Event $event)
     {
-        $request = $event->getSubject()->getRequest();
-        $request->trustProxy = true;
-        $raven = $event->getSubject()->getRaven();
-        $raven->user_context([
-            'username' => \Cake\Core\Configure::read('GlobalAuth.username'),
-            'ip_address' => $request->clientIp()
-        ]);
+        if (PHP_SAPI !== 'cli') {
+            /** @var ServerRequest $request */
+            $request = $event->getData('request') ?? ServerRequestFactory::fromGlobals();
+            $request->trustProxy = true;
 
-        $extra = [];
-
-        if(PHP_SAPI === 'cli')
-            $extra = ['cli' => true];
-
-        return ['extra' => $extra];
+            sentryConfigureScope(function (Scope $scope) use ($request, $event) {
+                $exception = $event->getData('exception');
+                if ($exception) {
+                    assert($exception instanceof \Exception);
+                    $scope->setTag('status', $exception->getCode());
+                }
+                $scope->setUser([
+                    'username' => \Cake\Core\Configure::read('GlobalAuth.username'),
+                    'ip_address' => $request->clientIp()
+                ]);
+                $scope->setExtras([
+                    // 'foo' => 'bar',
+                    'request_attrs' => $request->getAttributes(),
+                ]);
+            });
+        }
     }
 }
