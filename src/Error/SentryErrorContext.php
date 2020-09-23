@@ -6,7 +6,7 @@ use Cake\Event\EventListenerInterface;
 
 class SentryErrorContext implements EventListenerInterface
 {
-    public function implementedEvents()
+    public function implementedEvents(): array
     {
         return [
             'CakeSentry.Client.beforeCapture' => 'setContext',
