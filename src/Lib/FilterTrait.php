@@ -119,7 +119,7 @@ trait FilterTrait {
 				break;
 
 			case 'integer' :
-				$value = (int)$value || $value === 0 ? (int)$value : null;
+				$value = (int)$value || $value === 0 || $value === "0" ? (int)$value : null;
 				if($value !== null)
 					return $query->where([$key => $value]);
 				break;
