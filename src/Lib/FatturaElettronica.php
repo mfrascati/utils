@@ -114,6 +114,7 @@ class FatturaElettronica {
 					'Data' => $this->invoice->data->format('Y-m-d'),
 					'Numero' => $this->invoice->progressivo_invio,
 					'DatiRitenuta' => null, // Placeholder
+					'ScontoMaggiorazione' => null, // Placeholder
 					'Causale' => str_split($this->invoice->causale, 200),
 				],
 			],
@@ -146,6 +147,16 @@ class FatturaElettronica {
 		}
 		else
 			unset($data['DatiGenerali']['DatiGeneraliDocumento']['DatiRitenuta']);
+
+		if($this->invoice->sconto != 0)
+		{
+			$data['DatiGenerali']['DatiGeneraliDocumento']['ScontoMaggiorazione'] = [
+				'Tipo' => 'SC',
+				'Importo' => $this->__toDecimal($this->invoice->sconto),
+			];
+		}
+		else
+			unset($data['DatiGenerali']['DatiGeneraliDocumento']['ScontoMaggiorazione']);
 
 		return $data;
 	}
