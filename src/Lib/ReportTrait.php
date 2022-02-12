@@ -102,7 +102,7 @@ trait ReportTrait
 
 				$spreadsheet->getActiveSheet()->setCellValue($cell, $val);
 
-				if(in_array($type, ['string', 'boolean'])){
+				if(in_array($type, ['string', 'char', 'boolean'])){
 					continue;
 				}
 				elseif($type == 'integer'){
@@ -293,7 +293,7 @@ trait ReportTrait
 	 */
 	private function __mapType($type)
 	{
-		if(in_array($type, ['string', 'boolean']))
+		if(in_array($type, ['string', 'char', 'boolean']))
 			return $type;
 		if(in_array($type, ['integer', 'tinyinteger']))
 			return 'integer';
