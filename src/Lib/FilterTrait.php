@@ -81,12 +81,13 @@ trait FilterTrait {
 		
 		$data = $this->paginate($query);
 
-		$this->set([
-		    'success' => true,
-		    'data' => !$data->isEmpty() ? $data : [],
-		    'pagination' => $this->__paginationData(),
-		    '_serialize' => ['success', 'data', 'pagination']
-		]);
+		$res = [
+			'success' => true,
+			'data' => !$data->isEmpty() ? $data : [],
+			'pagination' => $this->__paginationData(),
+		];
+		$this->set($res);
+		$this->viewBuilder()->setOption('serialize', array_keys($res));
 		return true;
 	}
 
