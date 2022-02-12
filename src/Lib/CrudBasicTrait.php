@@ -115,11 +115,11 @@ trait CrudBasicTrait {
 	 * Il valore verrà letto da Configure EmailDrafts e restituito sotto l'indice top level emails
 	 * @param array  $data
 	 */
-	public function _setJson($data = [])
+	public function _setJson($data = [], $dataFallback = null)
 	{
 		$res = [
 			'success'	=> true,
-			'data'		=> $data,
+			'data'		=> $dataFallback ?? $data,
 			'warnings'	=> $this->_responseWarnings,
 	    ];
 
