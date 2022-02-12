@@ -197,16 +197,16 @@ trait FilterTrait {
 	 */
 	private function __paginationData()
 	{
-	    $pagination = $this->request->getParam('paging.'.$this->modelClass);
-	    $paginationResponse = [
-	        'page_count' => $pagination['pageCount'],
-	        'current_page' => $pagination['page'],
-	        'has_next_page' => $pagination['nextPage'],
-	        'has_prev_page' => $pagination['prevPage'],
-	        'count' => $pagination['count'],
-	        'limit' => $pagination['limit']
-	    ];
-	    return $paginationResponse;
+		$pagination = $this->request->getAttribute('paging')[$this->modelClass];
+		$paginationResponse = [
+			'page_count' => $pagination['pageCount'],
+			'current_page' => $pagination['page'],
+			'has_next_page' => $pagination['nextPage'],
+			'has_prev_page' => $pagination['prevPage'],
+			'count' => $pagination['count'],
+			'limit' => $pagination['limit']
+		];
+		return $paginationResponse;
 	}
 
 }
