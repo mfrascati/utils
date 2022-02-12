@@ -130,7 +130,7 @@ trait CrudBasicTrait {
 	    		$res[$key] = Configure::read($var);
 	    }
 
-	    $res['_serialize'] = array_keys($res);
+			$this->viewBuilder()->setOption('serialize', array_keys($res));
 	    $this->set($res); 
 	}
 
@@ -146,11 +146,12 @@ trait CrudBasicTrait {
 	 */
 	public function _setError($message, $code = 500)
 	{
-	    $this->set([
+		$res = [
 			'success'		=> false,
 			'data'			=> ['message' => $message, 'code' => $code],
 			'warnings'		=> $this->_responseWarnings,
-			'_serialize'	=> ['success', 'data']
-	    ]); 
+		];
+		$this->set($res);
+		$this->viewBuilder()->setOption('serialize', array_keys($res));
 	}
 }
