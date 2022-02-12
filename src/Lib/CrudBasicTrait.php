@@ -109,17 +109,16 @@ trait CrudBasicTrait {
 	}
 
 	/**
-	 * Scorciatoia per impostare le variabili success e data in view json
+	 * Scorciatoia per impostare la variabile data in view json
 	 * Per integrare la risposta con variabili aggiuntive è possibile definirle nell'app controller
 	 * Es. public $integrateResponseVars = ['emails' => 'EmailDrafts'];
 	 * Il valore verrà letto da Configure EmailDrafts e restituito sotto l'indice top level emails
-	 * @param boolean $success 
 	 * @param array  $data
 	 */
-	public function _setJson($success, $data = [])
+	public function _setJson($data = [])
 	{
 		$res = [
-			'success'	=> $success,
+			'success'	=> true,
 			'data'		=> $data,
 			'warnings'	=> $this->_responseWarnings,
 	    ];
