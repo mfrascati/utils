@@ -164,7 +164,7 @@ trait FilterTrait {
 				break;
 
 			case 'string[]' :
-				if(!empty($value)){
+				if(!empty($value) && $value != 'ALL'){
 					$value = explode('|', $value);
 					return $query->where([$key => $value], [$key => 'string[]']);
 				}
