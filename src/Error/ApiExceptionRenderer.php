@@ -10,7 +10,6 @@ class ApiExceptionRenderer extends ExceptionRenderer
 	protected function _outputMessage(string $template): Response
 	{
 		$vars = $this->controller->viewBuilder()->getVars();
-		logd($vars);
 		if(!$this->controller->getRequest()->is('json'))
 		{	
 			if(\Cake\Core\Configure::read('debug'))
