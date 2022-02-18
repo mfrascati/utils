@@ -196,7 +196,7 @@ trait FilterTrait {
 	 * Riorganizza i meta dati della paginazione per rimandarli in risposta
 	 * @return array
 	 */
-	private function __paginationData()
+	protected function __paginationData()
 	{
 		$pagination = $this->request->getAttribute('paging')[$this->modelClass];
 		$paginationResponse = [
